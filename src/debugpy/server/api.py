@@ -4,17 +4,17 @@
 
 import codecs
 import os
-import pydevd
 import socket
 import sys
 import threading
 
 import debugpy
+import pydevd
+from _pydevd_bundle.pydevd_constants import get_global_debugger
 from debugpy import adapter
 from debugpy.common import json, log, sockets
-from _pydevd_bundle.pydevd_constants import get_global_debugger
-from pydevd_file_utils import absolute_path
 from debugpy.common.util import hide_debugpy_internals
+from pydevd_file_utils import absolute_path
 
 _tls = threading.local()
 
@@ -42,7 +42,7 @@ def _settrace(*args, **kwargs):
     # The stdin in notification is not acted upon in debugpy, so, disable it.
     kwargs.setdefault("notify_stdin", False)
     try:
-        return pydevd.settrace(*args, **kwargs)
+        pydevd.settrace(*args, **kwargs)
     except Exception:
         raise
     else:
@@ -116,7 +116,7 @@ def _starts_debugging(func):
             port.__index__()  # ensure it's int-like
         except Exception:
             raise ValueError("expected port or (host, port)")
-        if not (0 <= port < 2 ** 16):
+        if not (0 <= port < 2**16):
             raise ValueError("invalid port number")
 
         ensure_logging()
@@ -153,7 +153,7 @@ def listen(address, settrace_kwargs, in_process_debug_adapter=False):
     if in_process_debug_adapter:
         host, port = address
         log.info("Listening: pydevd without debugpy adapter: {0}:{1}", host, port)
-        settrace_kwargs['patch_multiprocessing'] = False
+        settrace_kwargs["patch_multiprocessing"] = False
         _settrace(
             host=host,
             port=port,
@@ -218,7 +218,10 @@ def listen(address, settrace_kwargs, in_process_debug_adapter=False):
         try:
             global _adapter_process
             _adapter_process = subprocess.Popen(
-                adapter_args, close_fds=True, creationflags=creationflags, env=python_env
+                adapter_args,
+                close_fds=True,
+                creationflags=creationflags,
+                env=python_env,
             )
             if os.name == "posix":
                 # It's going to fork again to daemonize, so we need to wait on it to
